@@ -30,13 +30,21 @@ import urwid.raw_display
 
 def get_field(labeltext, inputname):
     """ Build a field in our form.  Called from get_body()"""
+    # we don't have hanging indent, but we can stick a bullet out into the 
+    # left column.
+    asterisk = urwid.Text(('label', '* '))
     label = urwid.Text(('label', labeltext))
+    colon = urwid.Text(('label', ': '))
+
     field = urwid.Edit('', '')
+
     field = urwid.AttrWrap(field, 'field', 'fieldfocus')
-    # #ut the label and field together.  Each column is given a 'weight' to 
-    # help determine the relative width of the column such that it can fill the 
-    # row.
-    editwidget = urwid.Columns([('weight', 1, label),
+    # put everything together.  Each column is either 'fixed' for a fixed width,
+    # or given a 'weight' to help determine the relative width of the column
+    # such that it can fill the row.
+    editwidget = urwid.Columns([('fixed', 2, asterisk),
+                                ('weight', 1, label),
+                                ('fixed', 2, colon),
                                 ('weight', 2, field)])
 
     wrapper = urwid.AttrWrap(editwidget, None, {'label':'labelfocus'})
