@@ -28,7 +28,7 @@ import urwid
 import urwid.raw_display
 
 
-def get_field(labeltext, inputname):
+def get_field(labeltext, inputname, fieldtype):
     """ Build a field in our form.  Called from get_body()"""
     # we don't have hanging indent, but we can stick a bullet out into the 
     # left column.
@@ -36,9 +36,15 @@ def get_field(labeltext, inputname):
     label = urwid.Text(('label', labeltext))
     colon = urwid.Text(('label', ': '))
 
-    field = urwid.Edit('', '')
+    if fieldtype == 'text':
+        field = urwid.Edit('', '')
+    elif fieldtype == 'checkbox':
+        field = urwid.CheckBox('')
+    else:
+        raise Exception()
 
     field = urwid.AttrWrap(field, 'field', 'fieldfocus')
+
     # put everything together.  Each column is either 'fixed' for a fixed width,
     # or given a 'weight' to help determine the relative width of the column
     # such that it can fill the row.
@@ -72,21 +78,21 @@ def get_header():
 def get_body():
     """ the body of our form, called from main() """
     fieldset = [
-              ('Project name', 'project'),
-              ('Version','version'),
-              ('Description (one liner)','shortdesc'),
-              ('Long description (multiline reStructuredText)', 'longdesc'),
-              ('Author','authorname'),
-              ('Author email','authoremail'),
-              ('URL to project page','projecturl'),
-              ('License','license'),
-              ('Zip safe?','zipsafe')
+              ('Project name', 'project', 'text'),
+              ('Version', 'version', 'text'),
+              ('Description (one liner)', 'shortdesc', 'text'),
+              ('Long description (multiline reStructuredText)', 'longdesc', 'text'),
+              ('Author', 'authorname', 'text'),
+              ('Author email', 'authoremail', 'text'),
+              ('URL to project page', 'projecturl', 'text'),
+              ('License', 'license', 'text'),
+              ('Zip safe?', 'zipsafe', 'checkbox')
         ]
 
     # build the list of field widgets
     fieldwidgets = [urwid.Divider(bottom=2)]
-    for (label, inputname) in fieldset:
-        fieldwidgets.append(get_field(label, inputname))
+    for (label, inputname, fieldtype) in fieldset:
+        fieldwidgets.append(get_field(label, inputname, fieldtype))
     
     fieldwidgets.append(urwid.Divider(bottom=1)) 
 
