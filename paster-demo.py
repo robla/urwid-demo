@@ -28,6 +28,14 @@ import urwid
 import urwid.raw_display
 
 
+def get_field(labeltext, inputname):
+    """ Build a field in our form. """
+    label = urwid.Text(labeltext + ': ')
+    field = urwid.Edit('', '')
+    # put the label and field together.
+    return urwid.Columns([label, field])
+
+
 def main():
     #  Our main loop is going to need three things: 
     #  1. frame - the UI with all of its widgets
@@ -50,8 +58,8 @@ def main():
     # build the list of field widgets
     fieldwidgets = []
     for (label, inputname) in fieldset:
-        fieldwidgets.append(urwid.Edit(label + ': ', ''))
-
+        fieldwidgets.append(get_field(label, inputname))
+    
     # SimpleListWalker provides simple linear navigation between the widgets
     listwalker = urwid.SimpleListWalker(fieldwidgets)
     listbox = urwid.ListBox(listwalker)
