@@ -56,7 +56,7 @@ def get_body():
         ]
 
     # build the list of field widgets
-    fieldwidgets = []
+    fieldwidgets = [urwid.Divider(bottom=2)]
     for (label, inputname) in fieldset:
         fieldwidgets.append(get_field(label, inputname))
     
