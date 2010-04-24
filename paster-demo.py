@@ -59,7 +59,7 @@ def get_buttons():
     b = urwid.Button('Cancel')
     cancelbutton = urwid.AttrWrap(b, 'button', 'buttonfocus')
 
-    return urwid.Columns([okbutton, cancelbutton])
+    return urwid.GridFlow([okbutton, cancelbutton], 10, 7, 1, 'center')
                                  
 def get_header():
     """ the header of our form, called from main() """
