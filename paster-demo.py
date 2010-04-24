@@ -28,7 +28,37 @@ import urwid
 import urwid.raw_display
 
 
-def get_field(labeltext, inputname, fieldtype):
+class FieldManager(object):
+    """ 
+    This class manages the field data without being entangled in the 
+    implementation details of the widget set.
+    """
+    def __init__(self):
+        self.getters = {}
+
+    def set_getter(self, name, function):
+        """ 
+        This is where we collect all of the field getter functions.
+        """
+        self.getters[name] = function
+        
+    def get_value(self, name):
+        """
+        This will actually get the value associated with a field name.
+        """
+        return self.getters[name]()
+
+    def get_value_dict(self):
+        """
+        Dump everything we've got.
+        """
+        retval = {}
+        for key in self.getters:
+            retval[key] = self.getters[key]()
+        return retval
+
+
+def get_field(labeltext, inputname, fieldtype, fieldmgr):
     """ Build a field in our form.  Called from get_body()"""
     # we don't have hanging indent, but we can stick a bullet out into the 
     # left column.
@@ -38,10 +68,25 @@ def get_field(labeltext, inputname, fieldtype):
 
     if fieldtype == 'text':
         field = urwid.Edit('', '')
+        def getter():
+            """ 
+            Closure around urwid.Edit.get_edit_text(), which we'll
+            use to scrape the value out when we're all done.
+            """
+            return field.get_edit_text()
+        fieldmgr.set_getter(inputname, getter)
     elif fieldtype == 'checkbox':
         field = urwid.CheckBox('')
+        def getter():
+            """ 
+            Closure around urwid.CheckBox.get_state(), which we'll
+            use to scrape the value out when we're all done. 
+            """
+            return field.get_state()
+        fieldmgr.set_getter(inputname, getter)
     else:
         raise Exception()
+
 
     field = urwid.AttrWrap(field, 'field', 'fieldfocus')
 
@@ -66,7 +111,7 @@ def get_buttons():
     cancelbutton = urwid.AttrWrap(b, 'button', 'buttonfocus')
 
     return urwid.GridFlow([okbutton, cancelbutton], 10, 7, 1, 'center')
-                                 
+
 def get_header():
     """ the header of our form, called from main() """
     text_header = ("'paster create' Configuration"
@@ -75,7 +120,7 @@ def get_header():
     header = urwid.Text(text_header)
     return urwid.AttrWrap(header, 'header')
 
-def get_body():
+def get_body(fieldmgr):
     """ the body of our form, called from main() """
     fieldset = [
               ('Project name', 'project', 'text'),
@@ -92,7 +137,7 @@ def get_body():
     # build the list of field widgets
     fieldwidgets = [urwid.Divider(bottom=2)]
     for (label, inputname, fieldtype) in fieldset:
-        fieldwidgets.append(get_field(label, inputname, fieldtype))
+        fieldwidgets.append(get_field(label, inputname, fieldtype, fieldmgr))
     
     fieldwidgets.append(urwid.Divider(bottom=1)) 
 
@@ -107,6 +152,9 @@ def get_body():
 
 
 def main():
+    # call our homebrewed object for managing our fields
+    fieldmgr = FieldManager()
+
     #  Our main loop is going to need four things: 
     #  1. frame - the UI with all of its widgets
     #  2. palette - style information for the UI
@@ -115,7 +163,7 @@ def main():
     
     #  1. frame - the UI with all of its widgets
     header = get_header()
-    body = get_body()
+    body = get_body(fieldmgr)
     frame = urwid.Frame(body, header=header)
 
     #  2. palette - style information for the UI
@@ -144,6 +192,9 @@ def main():
 
     # Putting it all together and running it
     urwid.MainLoop(frame, palette, screen, unhandled_input=unhandled).run()
+    
+    import pprint
+    pprint.pprint(fieldmgr.get_value_dict())
 
 if '__main__'==__name__:
     main()
