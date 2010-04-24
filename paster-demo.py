@@ -27,6 +27,9 @@
 import urwid
 import urwid.raw_display
 
+class ExitPasterDemo():
+    def __init__(self, exit_token=None):
+        self.exit_token = exit_token
 
 class FieldManager(object):
     """ 
@@ -103,11 +106,20 @@ def get_field(labeltext, inputname, fieldtype, fieldmgr):
 
 def get_buttons():
     """ renders the ok and cancel buttons.  Called from get_body() """
+
+    # this is going to be what we actually do when someone clicks the button
+    def ok_button_callback(button):
+        raise ExitPasterDemo(exit_token='ok')
+
     # leading spaces to center it....seems like there should be a better way
-    b = urwid.Button('  OK')
+    b = urwid.Button('  OK', on_press=ok_button_callback)
     okbutton = urwid.AttrWrap(b, 'button', 'buttonfocus')
 
-    b = urwid.Button('Cancel')
+    # second verse, same as the first....
+    def cancel_button_callback(button):
+        raise ExitPasterDemo(exit_token='cancel')
+
+    b = urwid.Button('Cancel', on_press=cancel_button_callback)
     cancelbutton = urwid.AttrWrap(b, 'button', 'buttonfocus')
 
     return urwid.GridFlow([okbutton, cancelbutton], 10, 7, 1, 'center')
@@ -188,13 +200,15 @@ def main():
         keystrokes.
         """
         if key == 'esc':
-            raise urwid.ExitMainLoop()
+            raise ExitPasterDemo(exit_token='cancel')
 
     # Putting it all together and running it
-    urwid.MainLoop(frame, palette, screen, unhandled_input=unhandled).run()
-    
-    import pprint
-    pprint.pprint(fieldmgr.get_value_dict())
+    try:
+        urwid.MainLoop(frame, palette, screen, unhandled_input=unhandled).run()
+    except ExitPasterDemo as inst:
+        import pprint
+        pprint.pprint(fieldmgr.get_value_dict())
+        print "Exit value: " + inst.exit_token
 
 if '__main__'==__name__:
     main()
