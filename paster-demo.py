@@ -30,21 +30,22 @@ import urwid.raw_display
 
 def get_field(labeltext, inputname):
     """ Build a field in our form. """
-    label = urwid.Text(labeltext + ': ')
+    label = urwid.Text(labeltext)
     field = urwid.Edit('', '')
     # put the label and field together.
     return urwid.Columns([label, field])
 
 
 def main():
-    #  Our main loop is going to need three things: 
+    #  Our main loop is going to need four things: 
     #  1. frame - the UI with all of its widgets
     #  2. palette - style information for the UI
     #  3. screen - the engine used to render everything
+    #  4. unhandled_input function - to deal with top level keystrokes
     
     #  1. frame - the UI with all of its widgets
     text_header = ("'paster create' Configuration"
-        " - Use arrow keys to select a field to edit")
+        " - Use arrow keys to select a field to edit, press ESC to exit")
     header = urwid.Text(text_header)
 
     fieldset = [
@@ -76,8 +77,17 @@ def main():
     #  3. screen - the engine used to render everything
     screen = urwid.raw_display.Screen()
 
+    #  4. unhandled_input function - to deal with top level keystrokes
+    def unhandled(key):
+        """ 
+        Function to pass in to MainLoop to handle otherwise unhandled 
+        keystrokes.
+        """
+        if key == 'esc':
+            raise urwid.ExitMainLoop()
+
     # Putting it all together and running it
-    urwid.MainLoop(frame, None, screen).run()
+    urwid.MainLoop(frame, None, screen, unhandled_input=unhandled).run()
 
 if '__main__'==__name__:
     main()
