@@ -30,8 +30,9 @@ import urwid.raw_display
 
 def get_field(labeltext, inputname):
     """ Build a field in our form.  Called from get_body()"""
-    label = urwid.Text(labeltext)
+    label = urwid.Text(('label', labeltext))
     field = urwid.Edit('', '')
+    field = urwid.AttrWrap(field, 'field', 'fieldfocus')
     # put the label and field together.
     editwidget = urwid.Columns([label, field])
 
@@ -39,8 +40,12 @@ def get_field(labeltext, inputname):
 
 def get_buttons():
     """ renders the ok and cancel buttons.  Called from get_body() """
-    okbutton = urwid.Button('OK')
-    cancelbutton = urwid.Button('Cancel')
+    # leading spaces to center it....seems like there should be a better way
+    b = urwid.Button('  OK')
+    okbutton = urwid.AttrWrap(b, 'button', 'buttonfocus')
+
+    b = urwid.Button('Cancel')
+    cancelbutton = urwid.AttrWrap(b, 'button', 'buttonfocus')
 
     return urwid.Columns([okbutton, cancelbutton])
                                  
@@ -49,7 +54,8 @@ def get_header():
     text_header = ("'paster create' Configuration"
         " - Use arrow keys to select a field to edit, select 'OK'"
         " when finished, or press ESC/select 'Cancel' to exit")
-    return urwid.Text(text_header)
+    header = urwid.Text(text_header)
+    return urwid.AttrWrap(header, 'header')
 
 def get_body():
     """ the body of our form, called from main() """
@@ -78,7 +84,8 @@ def get_body():
     listwalker = urwid.SimpleListWalker(fieldwidgets)
     
     # ListBox is a scrollable frame around a list of elements
-    return urwid.ListBox(listwalker)
+    listbox = urwid.ListBox(listwalker)
+    return urwid.AttrWrap(listbox, 'body')
 
 
 def main():
@@ -94,8 +101,16 @@ def main():
     frame = urwid.Frame(body, header=header)
 
     #  2. palette - style information for the UI
-    #  ....we'll get to this
-    
+    palette = [
+        ('body','black','white', 'standout'),
+        ('header','black','light gray', 'bold'),
+        ('label','black', 'white'),
+        ('fieldfocus','black,underline', 'white', 'bold, underline'),
+        ('field','black', 'white'),
+        ('button','black','white'),
+        ('buttonfocus','black','light gray','bold'),
+        ]
+
     #  3. screen - the engine used to render everything
     screen = urwid.raw_display.Screen()
 
@@ -109,7 +124,7 @@ def main():
             raise urwid.ExitMainLoop()
 
     # Putting it all together and running it
-    urwid.MainLoop(frame, None, screen, unhandled_input=unhandled).run()
+    urwid.MainLoop(frame, palette, screen, unhandled_input=unhandled).run()
 
 if '__main__'==__name__:
     main()
