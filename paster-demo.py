@@ -40,7 +40,8 @@ def get_field(labeltext, inputname):
 def get_header():
     """ the header of our form, called from main() """
     text_header = ("'paster create' Configuration"
-        " - Use arrow keys to select a field to edit, press ESC to exit")
+        " - Use arrow keys to select a field to edit, select 'OK'"
+        " when finished, or press ESC/select 'Cancel' to exit")
     return urwid.Text(text_header)
 
 def get_body():
@@ -62,6 +63,15 @@ def get_body():
     for (label, inputname) in fieldset:
         fieldwidgets.append(get_field(label, inputname))
     
+    fieldwidgets.append(urwid.Divider(bottom=1)) 
+
+    okbutton = urwid.Button('OK')
+    cancelbutton = urwid.Button('Cancel')
+
+    buttons = urwid.Columns([okbutton, cancelbutton])
+
+    fieldwidgets.append(buttons)
+
     # SimpleListWalker provides simple linear navigation between the widgets
     listwalker = urwid.SimpleListWalker(fieldwidgets)
     
