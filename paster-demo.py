@@ -43,6 +43,10 @@ def main():
     #  3. screen - the engine used to render everything
     
     #  1. frame - the UI with all of its widgets
+    text_header = ("'paster create' Configuration"
+        " - Use arrow keys to select a field to edit")
+    header = urwid.Text(text_header)
+
     fieldset = [
               ('Project name', 'project'),
               ('Version','version'),
@@ -62,8 +66,9 @@ def main():
     
     # SimpleListWalker provides simple linear navigation between the widgets
     listwalker = urwid.SimpleListWalker(fieldwidgets)
-    listbox = urwid.ListBox(listwalker)
-    frame = urwid.Frame(listbox)
+    
+    body = urwid.ListBox(listwalker)
+    frame = urwid.Frame(body, header=header)
 
     #  2. palette - style information for the UI
     #  ....we'll get to this
