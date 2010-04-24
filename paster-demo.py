@@ -29,25 +29,20 @@ import urwid.raw_display
 
 
 def get_field(labeltext, inputname):
-    """ Build a field in our form. """
+    """ Build a field in our form.  Called from get_body()"""
     label = urwid.Text(labeltext)
     field = urwid.Edit('', '')
     # put the label and field together.
     return urwid.Columns([label, field])
 
-
-def main():
-    #  Our main loop is going to need four things: 
-    #  1. frame - the UI with all of its widgets
-    #  2. palette - style information for the UI
-    #  3. screen - the engine used to render everything
-    #  4. unhandled_input function - to deal with top level keystrokes
-    
-    #  1. frame - the UI with all of its widgets
+def get_header():
+    """ the header of our form, called from main() """
     text_header = ("'paster create' Configuration"
         " - Use arrow keys to select a field to edit, press ESC to exit")
-    header = urwid.Text(text_header)
+    return urwid.Text(text_header)
 
+def get_body():
+    """ the body of our form, called from main() """
     fieldset = [
               ('Project name', 'project'),
               ('Version','version'),
@@ -68,7 +63,20 @@ def main():
     # SimpleListWalker provides simple linear navigation between the widgets
     listwalker = urwid.SimpleListWalker(fieldwidgets)
     
-    body = urwid.ListBox(listwalker)
+    # ListBox is a scrollable frame around a list of elements
+    return urwid.ListBox(listwalker)
+
+
+def main():
+    #  Our main loop is going to need four things: 
+    #  1. frame - the UI with all of its widgets
+    #  2. palette - style information for the UI
+    #  3. screen - the engine used to render everything
+    #  4. unhandled_input function - to deal with top level keystrokes
+    
+    #  1. frame - the UI with all of its widgets
+    header = get_header()
+    body = get_body()
     frame = urwid.Frame(body, header=header)
 
     #  2. palette - style information for the UI
