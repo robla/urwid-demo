@@ -37,6 +37,13 @@ def get_field(labeltext, inputname):
 
     return urwid.Padding(editwidget, ('fixed left', 3), ('fixed right', 3))
 
+def get_buttons():
+    """ renders the ok and cancel buttons.  Called from get_body() """
+    okbutton = urwid.Button('OK')
+    cancelbutton = urwid.Button('Cancel')
+
+    return urwid.Columns([okbutton, cancelbutton])
+                                 
 def get_header():
     """ the header of our form, called from main() """
     text_header = ("'paster create' Configuration"
@@ -65,12 +72,7 @@ def get_body():
     
     fieldwidgets.append(urwid.Divider(bottom=1)) 
 
-    okbutton = urwid.Button('OK')
-    cancelbutton = urwid.Button('Cancel')
-
-    buttons = urwid.Columns([okbutton, cancelbutton])
-
-    fieldwidgets.append(buttons)
+    fieldwidgets.append(get_buttons())
 
     # SimpleListWalker provides simple linear navigation between the widgets
     listwalker = urwid.SimpleListWalker(fieldwidgets)
