@@ -33,8 +33,11 @@ def get_field(labeltext, inputname):
     label = urwid.Text(('label', labeltext))
     field = urwid.Edit('', '')
     field = urwid.AttrWrap(field, 'field', 'fieldfocus')
-    # put the label and field together.
-    editwidget = urwid.Columns([label, field])
+    # #ut the label and field together.  Each column is given a 'weight' to 
+    # help determine the relative width of the column such that it can fill the 
+    # row.
+    editwidget = urwid.Columns([('weight', 1, label),
+                                ('weight', 2, field)])
 
     wrapper = urwid.AttrWrap(editwidget, None, {'label':'labelfocus'})
     return urwid.Padding(wrapper, ('fixed left', 3), ('fixed right', 3))
