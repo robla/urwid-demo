@@ -36,7 +36,8 @@ def get_field(labeltext, inputname):
     # put the label and field together.
     editwidget = urwid.Columns([label, field])
 
-    return urwid.Padding(editwidget, ('fixed left', 3), ('fixed right', 3))
+    wrapper = urwid.AttrWrap(editwidget, None, {'label':'labelfocus'})
+    return urwid.Padding(wrapper, ('fixed left', 3), ('fixed right', 3))
 
 def get_buttons():
     """ renders the ok and cancel buttons.  Called from get_body() """
@@ -104,7 +105,8 @@ def main():
     palette = [
         ('body','black','white', 'standout'),
         ('header','black','light gray', 'bold'),
-        ('label','black', 'white'),
+        ('labelfocus','black', 'white', 'bold, underline'),
+        ('label','dark blue', 'white'),
         ('fieldfocus','black,underline', 'white', 'bold, underline'),
         ('field','black', 'white'),
         ('button','black','white'),
