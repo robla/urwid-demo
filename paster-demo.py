@@ -114,6 +114,11 @@ def main():
     #  2. palette - style information for the UI
     
     #  1. topmost widget - a "box widget" at the top of the widget hierarchy
+    text_header = ("'paster create' Configuration"
+        " - Use arrow keys to select a field to edit, select 'OK'"
+        " when finished, or select 'Cancel' to exit")
+    header = urwid.Text(text_header)
+
     fieldset = [
               ('Project name', 'project', 'text'),
               ('Version', 'version', 'text'),
@@ -138,13 +143,14 @@ def main():
 
     # ListBox is a scrollable frame around a list of elements
     listbox = urwid.ListBox(listwalker)
+    frame = urwid.Frame(listbox, header=header)
 
     #  2. palette - style information for the UI
     #  ....we'll get to this
 
     # Pass the topmost box widget to the MainLoop to start the show
     try:
-        urwid.MainLoop(listbox, None).run()
+        urwid.MainLoop(frame, None).run()
     except ExitPasterDemo as inst:
         import pprint
         pprint.pprint(fieldmgr.get_value_dict())
