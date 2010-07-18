@@ -80,6 +80,9 @@ def main():
     try:
         urwid.MainLoop(listbox, None).run()
     except ExitPasterDemo as inst:
+        for i in range(len(fieldset)):
+            print fieldset[i][0] + ':',
+            print fieldwidgets[i].get_edit_text()
         print "Exit value: " + inst.exit_token
 
 if '__main__'==__name__:
