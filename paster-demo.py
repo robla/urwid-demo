@@ -25,11 +25,12 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 
 import urwid
-import urwid.raw_display
+
 
 class ExitPasterDemo():
     def __init__(self, exit_token=None):
         self.exit_token = exit_token
+
 
 class FieldManager(object):
     """ 
@@ -87,9 +88,6 @@ def get_field(labeltext, inputname, fieldtype, fieldmgr):
             """
             return field.get_state()
         fieldmgr.set_getter(inputname, getter)
-    else:
-        raise Exception()
-
 
     field = urwid.AttrWrap(field, 'field', 'fieldfocus')
 
@@ -103,6 +101,7 @@ def get_field(labeltext, inputname, fieldtype, fieldmgr):
 
     wrapper = urwid.AttrWrap(editwidget, None, {'label':'labelfocus'})
     return urwid.Padding(wrapper, ('fixed left', 3), ('fixed right', 3))
+
 
 def get_buttons():
     """ renders the ok and cancel buttons.  Called from get_body() """
@@ -118,11 +117,11 @@ def get_buttons():
     # second verse, same as the first....
     def cancel_button_callback(button):
         raise ExitPasterDemo(exit_token='cancel')
-
     b = urwid.Button('Cancel', on_press=cancel_button_callback)
     cancelbutton = urwid.AttrWrap(b, 'button', 'buttonfocus')
 
     return urwid.GridFlow([okbutton, cancelbutton], 10, 7, 1, 'center')
+
 
 def get_header():
     """ the header of our form, called from main() """
@@ -131,6 +130,7 @@ def get_header():
         " when finished, or press ESC/select 'Cancel' to exit")
     header = urwid.Text(text_header)
     return urwid.AttrWrap(header, 'header')
+
 
 def get_body(fieldmgr):
     """ the body of our form, called from main() """
@@ -150,14 +150,14 @@ def get_body(fieldmgr):
     fieldwidgets = [urwid.Divider(bottom=2)]
     for (label, inputname, fieldtype) in fieldset:
         fieldwidgets.append(get_field(label, inputname, fieldtype, fieldmgr))
-    
+
     fieldwidgets.append(urwid.Divider(bottom=1)) 
 
     fieldwidgets.append(get_buttons())
 
     # SimpleListWalker provides simple linear navigation between the widgets
     listwalker = urwid.SimpleListWalker(fieldwidgets)
-    
+
     # ListBox is a scrollable frame around a list of elements
     listbox = urwid.ListBox(listwalker)
     return urwid.AttrWrap(listbox, 'body')
@@ -167,13 +167,12 @@ def main():
     # call our homebrewed object for managing our fields
     fieldmgr = FieldManager()
 
-    #  Our main loop is going to need four things: 
-    #  1. frame - the UI with all of its widgets
+    #  Our main loop is going to need three things: 
+    #  1. topmost widget - a "box widget" at the top of the widget hierarchy
     #  2. palette - style information for the UI
-    #  3. screen - the engine used to render everything
-    #  4. unhandled_input function - to deal with top level keystrokes
+    #  3. unhandled_input function - to deal with top level keystrokes
     
-    #  1. frame - the UI with all of its widgets
+    #  1. topmost widget - a "box widget" at the top of the widget hierarchy
     header = get_header()
     body = get_body(fieldmgr)
     frame = urwid.Frame(body, header=header)
@@ -190,10 +189,7 @@ def main():
         ('buttonfocus','black','light gray','bold'),
         ]
 
-    #  3. screen - the engine used to render everything
-    screen = urwid.raw_display.Screen()
-
-    #  4. unhandled_input function - to deal with top level keystrokes
+    #  3. unhandled_input function - to deal with top level keystrokes
     def unhandled(key):
         """ 
         Function to pass in to MainLoop to handle otherwise unhandled 
@@ -202,9 +198,9 @@ def main():
         if key == 'esc':
             raise ExitPasterDemo(exit_token='cancel')
 
-    # Putting it all together and running it
+    # Pass the topmost box widget to the MainLoop to start the show
     try:
-        urwid.MainLoop(frame, palette, screen, unhandled_input=unhandled).run()
+        urwid.MainLoop(frame, palette, unhandled_input=unhandled).run()
     except ExitPasterDemo as inst:
         import pprint
         pprint.pprint(fieldmgr.get_value_dict())
