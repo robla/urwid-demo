@@ -50,6 +50,12 @@ def main():
     for (label, inputname) in fieldset:
         fieldwidgets.append(urwid.Edit(label + ': ', ''))
 
+    okbutton = urwid.Button('OK')
+    cancelbutton = urwid.Button('Cancel')
+    buttons = urwid.Columns([okbutton, cancelbutton])
+
+    fieldwidgets.append(buttons)
+
     # SimpleListWalker provides simple linear navigation between the widgets
     listwalker = urwid.SimpleListWalker(fieldwidgets)
 
