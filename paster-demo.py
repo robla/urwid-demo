@@ -109,7 +109,7 @@ def get_header():
     """ the header of our form, called from main() """
     text_header = ("'paster create' Configuration"
         " - Use arrow keys to select a field to edit, select 'OK'"
-        " when finished, or select 'Cancel' to exit")
+        " when finished, or press ESC/select 'Cancel' to exit")
     return urwid.Text(text_header)
 
 
@@ -145,9 +145,10 @@ def main():
     # call our homebrewed object for managing our fields
     fieldmgr = FieldManager()
 
-    #  Our main loop is going to need a couple of things: 
+    #  Our main loop is going to need three things: 
     #  1. topmost widget - a "box widget" at the top of the widget hierarchy
     #  2. palette - style information for the UI
+    #  3. unhandled_input function - to deal with top level keystrokes
     
     #  1. topmost widget - a "box widget" at the top of the widget hierarchy
     header = get_header()
@@ -157,9 +158,18 @@ def main():
     #  2. palette - style information for the UI
     #  ....we'll get to this
 
+    #  3. unhandled_input function - to deal with top level keystrokes
+    def unhandled(key):
+        """ 
+        Function to pass in to MainLoop to handle otherwise unhandled 
+        keystrokes.
+        """
+        if key == 'esc':
+            raise ExitPasterDemo(exit_token='cancel')
+
     # Pass the topmost box widget to the MainLoop to start the show
     try:
-        urwid.MainLoop(frame, None).run()
+        urwid.MainLoop(frame, None, unhandled_input=unhandled).run()
     except ExitPasterDemo as inst:
         import pprint
         pprint.pprint(fieldmgr.get_value_dict())
