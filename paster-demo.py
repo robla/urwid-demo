@@ -97,14 +97,16 @@ def get_buttons():
     # this is going to be what we actually do when someone clicks the button
     def ok_button_callback(button):
         raise ExitPasterDemo(exit_token='ok')
-    okbutton = urwid.Button('OK', on_press=ok_button_callback)
+
+    # leading spaces to center it....seems like there should be a better way
+    okbutton = urwid.Button('  OK', on_press=ok_button_callback)
 
     # second verse, same as the first....
     def cancel_button_callback(button):
         raise ExitPasterDemo(exit_token='cancel')
     cancelbutton = urwid.Button('Cancel', on_press=cancel_button_callback)
 
-    return urwid.Columns([okbutton, cancelbutton])
+    return urwid.GridFlow([okbutton, cancelbutton], 10, 7, 1, 'center')
 
 
 def get_header():
