@@ -32,6 +32,22 @@ class ExitPasterDemo():
         self.exit_token = exit_token
 
 
+def get_buttons():
+    """ renders the ok and cancel buttons."""
+
+    # this is going to be what we actually do when someone clicks the button
+    def ok_button_callback(button):
+        raise ExitPasterDemo(exit_token='ok')
+    okbutton = urwid.Button('OK', on_press=ok_button_callback)
+
+    # second verse, same as the first....
+    def cancel_button_callback(button):
+        raise ExitPasterDemo(exit_token='cancel')
+    cancelbutton = urwid.Button('Cancel', on_press=cancel_button_callback)
+
+    return urwid.Columns([okbutton, cancelbutton])
+
+
 def main():
     #  Our main loop is going to need a couple of things: 
     #  1. topmost widget - a "box widget" at the top of the widget hierarchy
@@ -59,17 +75,7 @@ def main():
             field = urwid.CheckBox(label)
         fieldwidgets.append(field)
 
-    # this is going to be what we actually do when someone clicks the button
-    def ok_button_callback(button):
-        raise ExitPasterDemo(exit_token='ok')
-    okbutton = urwid.Button('OK', on_press=ok_button_callback)
-
-    # second verse, same as the first....
-    def cancel_button_callback(button):
-        raise ExitPasterDemo(exit_token='cancel')
-    cancelbutton = urwid.Button('Cancel', on_press=cancel_button_callback)
-
-    fieldwidgets.append(urwid.Columns([okbutton, cancelbutton]))
+    fieldwidgets.append(get_buttons())
 
     # SimpleListWalker provides simple linear navigation between the widgets
     listwalker = urwid.SimpleListWalker(fieldwidgets)
