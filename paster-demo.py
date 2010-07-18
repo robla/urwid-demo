@@ -85,8 +85,11 @@ def get_field(labeltext, inputname, fieldtype, fieldmgr):
             return field.get_state()
         fieldmgr.set_getter(inputname, getter)
 
-    # put the label and field together.
-    editwidget = urwid.Columns([label, field])
+    # put the label and field together.  Each column is given a 'weight' to 
+    # help determine the relative width of the column such that it can fill the 
+    # row.
+    editwidget = urwid.Columns([('weight', 1, label),
+                                ('weight', 2, field)])
 
     return urwid.Padding(editwidget, ('fixed left', 3), ('fixed right', 3))
 
