@@ -64,7 +64,11 @@ class FieldManager(object):
 
 def get_field(labeltext, inputname, fieldtype, fieldmgr):
     """ Build a field in our form.  Called from get_body()"""
-    label = urwid.Text(labeltext + ': ')
+    # we don't have hanging indent, but we can stick a bullet out into the 
+    # left column.
+    asterisk = urwid.Text('* ')
+    label = urwid.Text(labeltext)
+    colon = urwid.Text(': ')
 
     if fieldtype == 'text':
         field = urwid.Edit('', '')
@@ -85,10 +89,12 @@ def get_field(labeltext, inputname, fieldtype, fieldmgr):
             return field.get_state()
         fieldmgr.set_getter(inputname, getter)
 
-    # put the label and field together.  Each column is given a 'weight' to 
-    # help determine the relative width of the column such that it can fill the 
-    # row.
-    editwidget = urwid.Columns([('weight', 1, label),
+    # put everything together.  Each column is either 'fixed' for a fixed width,
+    # or given a 'weight' to help determine the relative width of the column
+    # such that it can fill the row.
+    editwidget = urwid.Columns([('fixed', 2, asterisk),
+                                ('weight', 1, label),
+                                ('fixed', 2, colon),
                                 ('weight', 2, field)])
 
     return urwid.Padding(editwidget, ('fixed left', 3), ('fixed right', 3))
