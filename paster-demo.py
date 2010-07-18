@@ -32,14 +32,59 @@ class ExitPasterDemo():
         self.exit_token = exit_token
 
 
-def get_field(labeltext, inputname, fieldtype):
+class FieldManager(object):
+    """ 
+    This class manages the field data without being entangled in the 
+    implementation details of the widget set.
+    """
+    def __init__(self):
+        self.getters = {}
+
+    def set_getter(self, name, function):
+        """ 
+        This is where we collect all of the field getter functions.
+        """
+        self.getters[name] = function
+        
+    def get_value(self, name):
+        """
+        This will actually get the value associated with a field name.
+        """
+        return self.getters[name]()
+
+    def get_value_dict(self):
+        """
+        Dump everything we've got.
+        """
+        retval = {}
+        for key in self.getters:
+            retval[key] = self.getters[key]()
+        return retval
+
+
+def get_field(labeltext, inputname, fieldtype, fieldmgr):
     """ Build a field in our form."""
     label = urwid.Text(labeltext + ': ')
 
     if fieldtype == 'text':
         field = urwid.Edit('', '')
+        def getter():
+            """ 
+            Closure around urwid.Edit.get_edit_text(), which we'll
+            use to scrape the value out when we're all done.
+            """
+            return field.get_edit_text()
+        fieldmgr.set_getter(inputname, getter)
     elif fieldtype == 'checkbox':
         field = urwid.CheckBox('')
+        def getter():
+            """ 
+            Closure around urwid.CheckBox.get_state(), which we'll
+            use to scrape the value out when we're all done. 
+            """
+            return field.get_state()
+        fieldmgr.set_getter(inputname, getter)
+
     # put the label and field together.
     return urwid.Columns([label, field])
 
@@ -61,6 +106,9 @@ def get_buttons():
 
 
 def main():
+    # call our homebrewed object for managing our fields
+    fieldmgr = FieldManager()
+
     #  Our main loop is going to need a couple of things: 
     #  1. topmost widget - a "box widget" at the top of the widget hierarchy
     #  2. palette - style information for the UI
@@ -81,7 +129,7 @@ def main():
     # build the list of field widgets
     fieldwidgets = []
     for (label, inputname, fieldtype) in fieldset:
-        fieldwidgets.append(get_field(label, inputname, fieldtype))
+        fieldwidgets.append(get_field(label, inputname, fieldtype, fieldmgr))
 
     fieldwidgets.append(get_buttons())
 
@@ -98,12 +146,8 @@ def main():
     try:
         urwid.MainLoop(listbox, None).run()
     except ExitPasterDemo as inst:
-        for i in range(len(fieldset)):
-            print fieldset[i][0] + ':',
-            if fieldset[i][2] == 'text':
-                print fieldwidgets[i].widget_list[1].get_edit_text()
-            elif fieldset[i][2] == 'checkbox':
-                print fieldwidgets[i].widget_list[1].get_state()
+        import pprint
+        pprint.pprint(fieldmgr.get_value_dict())
         print "Exit value: " + inst.exit_token
 
 if '__main__'==__name__:
