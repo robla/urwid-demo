@@ -86,7 +86,9 @@ def get_field(labeltext, inputname, fieldtype, fieldmgr):
         fieldmgr.set_getter(inputname, getter)
 
     # put the label and field together.
-    return urwid.Columns([label, field])
+    editwidget = urwid.Columns([label, field])
+
+    return urwid.Padding(editwidget, ('fixed left', 3), ('fixed right', 3))
 
 
 def get_buttons():
