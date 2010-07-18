@@ -66,9 +66,9 @@ def get_field(labeltext, inputname, fieldtype, fieldmgr):
     """ Build a field in our form.  Called from get_body()"""
     # we don't have hanging indent, but we can stick a bullet out into the 
     # left column.
-    asterisk = urwid.Text('* ')
-    label = urwid.Text(labeltext)
-    colon = urwid.Text(': ')
+    asterisk = urwid.Text(('label', '* '))
+    label = urwid.Text(('label', labeltext))
+    colon = urwid.Text(('label', ': '))
 
     if fieldtype == 'text':
         field = urwid.Edit('', '')
@@ -89,6 +89,8 @@ def get_field(labeltext, inputname, fieldtype, fieldmgr):
             return field.get_state()
         fieldmgr.set_getter(inputname, getter)
 
+    field = urwid.AttrWrap(field, 'field', 'fieldfocus')
+
     # put everything together.  Each column is either 'fixed' for a fixed width,
     # or given a 'weight' to help determine the relative width of the column
     # such that it can fill the row.
@@ -97,7 +99,8 @@ def get_field(labeltext, inputname, fieldtype, fieldmgr):
                                 ('fixed', 2, colon),
                                 ('weight', 2, field)])
 
-    return urwid.Padding(editwidget, ('fixed left', 3), ('fixed right', 3))
+    wrapper = urwid.AttrWrap(editwidget, None, {'label':'labelfocus'})
+    return urwid.Padding(wrapper, ('fixed left', 3), ('fixed right', 3))
 
 
 def get_buttons():
@@ -108,12 +111,14 @@ def get_buttons():
         raise ExitPasterDemo(exit_token='ok')
 
     # leading spaces to center it....seems like there should be a better way
-    okbutton = urwid.Button('  OK', on_press=ok_button_callback)
+    b = urwid.Button('  OK', on_press=ok_button_callback)
+    okbutton = urwid.AttrWrap(b, 'button', 'buttonfocus')
 
     # second verse, same as the first....
     def cancel_button_callback(button):
         raise ExitPasterDemo(exit_token='cancel')
-    cancelbutton = urwid.Button('Cancel', on_press=cancel_button_callback)
+    b = urwid.Button('Cancel', on_press=cancel_button_callback)
+    cancelbutton = urwid.AttrWrap(b, 'button', 'buttonfocus')
 
     return urwid.GridFlow([okbutton, cancelbutton], 10, 7, 1, 'center')
 
@@ -123,7 +128,8 @@ def get_header():
     text_header = ("'paster create' Configuration"
         " - Use arrow keys to select a field to edit, select 'OK'"
         " when finished, or press ESC/select 'Cancel' to exit")
-    return urwid.Text(text_header)
+    header = urwid.Text(text_header)
+    return urwid.AttrWrap(header, 'header')
 
 
 def get_body(fieldmgr):
@@ -153,7 +159,8 @@ def get_body(fieldmgr):
     listwalker = urwid.SimpleListWalker(fieldwidgets)
 
     # ListBox is a scrollable frame around a list of elements
-    return urwid.ListBox(listwalker)
+    listbox = urwid.ListBox(listwalker)
+    return urwid.AttrWrap(listbox, 'body')
 
 
 def main():
@@ -171,7 +178,16 @@ def main():
     frame = urwid.Frame(body, header=header)
 
     #  2. palette - style information for the UI
-    #  ....we'll get to this
+    palette = [
+        ('body','black','white', 'standout'),
+        ('header','black','light gray', 'bold'),
+        ('labelfocus','black', 'white', 'bold, underline'),
+        ('label','dark blue', 'white'),
+        ('fieldfocus','black,underline', 'white', 'bold, underline'),
+        ('field','black', 'white'),
+        ('button','black','white'),
+        ('buttonfocus','black','light gray','bold'),
+        ]
 
     #  3. unhandled_input function - to deal with top level keystrokes
     def unhandled(key):
@@ -184,7 +200,7 @@ def main():
 
     # Pass the topmost box widget to the MainLoop to start the show
     try:
-        urwid.MainLoop(frame, None, unhandled_input=unhandled).run()
+        urwid.MainLoop(frame, palette, unhandled_input=unhandled).run()
     except ExitPasterDemo as inst:
         import pprint
         pprint.pprint(fieldmgr.get_value_dict())
