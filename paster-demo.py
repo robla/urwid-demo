@@ -128,9 +128,11 @@ def get_body(fieldmgr):
         ]
 
     # build the list of field widgets
-    fieldwidgets = []
+    fieldwidgets = [urwid.Divider(bottom=2)]
     for (label, inputname, fieldtype) in fieldset:
         fieldwidgets.append(get_field(label, inputname, fieldtype, fieldmgr))
+
+    fieldwidgets.append(urwid.Divider(bottom=1)) 
 
     fieldwidgets.append(get_buttons())
 
