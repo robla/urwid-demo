@@ -27,6 +27,11 @@
 import urwid
 
 
+class ExitPasterDemo():
+    def __init__(self, exit_token=None):
+        self.exit_token = exit_token
+
+
 def main():
     #  Our main loop is going to need a couple of things: 
     #  1. topmost widget - a "box widget" at the top of the widget hierarchy
@@ -50,11 +55,17 @@ def main():
     for (label, inputname) in fieldset:
         fieldwidgets.append(urwid.Edit(label + ': ', ''))
 
-    okbutton = urwid.Button('OK')
-    cancelbutton = urwid.Button('Cancel')
-    buttons = urwid.Columns([okbutton, cancelbutton])
+    # this is going to be what we actually do when someone clicks the button
+    def ok_button_callback(button):
+        raise ExitPasterDemo(exit_token='ok')
+    okbutton = urwid.Button('OK', on_press=ok_button_callback)
 
-    fieldwidgets.append(buttons)
+    # second verse, same as the first....
+    def cancel_button_callback(button):
+        raise ExitPasterDemo(exit_token='cancel')
+    cancelbutton = urwid.Button('Cancel', on_press=cancel_button_callback)
+
+    fieldwidgets.append(urwid.Columns([okbutton, cancelbutton]))
 
     # SimpleListWalker provides simple linear navigation between the widgets
     listwalker = urwid.SimpleListWalker(fieldwidgets)
@@ -66,7 +77,10 @@ def main():
     #  ....we'll get to this
 
     # Pass the topmost box widget to the MainLoop to start the show
-    urwid.MainLoop(listbox, None).run()
+    try:
+        urwid.MainLoop(listbox, None).run()
+    except ExitPasterDemo as inst:
+        print "Exit value: " + inst.exit_token
 
 if '__main__'==__name__:
     main()
