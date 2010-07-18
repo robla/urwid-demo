@@ -32,6 +32,15 @@ class ExitPasterDemo():
         self.exit_token = exit_token
 
 
+def get_field(labeltext, inputname, fieldtype):
+    """ Build a field in our form."""
+    if fieldtype == 'text':
+        field = urwid.Edit(labeltext + ': ', '')
+    elif fieldtype == 'checkbox':
+        field = urwid.CheckBox(labeltext)
+    return field
+
+
 def get_buttons():
     """ renders the ok and cancel buttons."""
 
@@ -69,11 +78,7 @@ def main():
     # build the list of field widgets
     fieldwidgets = []
     for (label, inputname, fieldtype) in fieldset:
-        if fieldtype == 'text':
-            field = urwid.Edit(label + ': ', '')
-        elif fieldtype == 'checkbox':
-            field = urwid.CheckBox(label)
-        fieldwidgets.append(field)
+        fieldwidgets.append(get_field(label, inputname, fieldtype))
 
     fieldwidgets.append(get_buttons())
 
