@@ -39,21 +39,25 @@ def main():
     
     #  1. topmost widget - a "box widget" at the top of the widget hierarchy
     fieldset = [
-              ('Project name', 'project'),
-              ('Version','version'),
-              ('Description (one liner)','shortdesc'),
-              ('Long description (multiline reStructuredText)', 'longdesc'),
-              ('Author','authorname'),
-              ('Author email','authoremail'),
-              ('URL to project page','projecturl'),
-              ('License','license'),
-              ('Zip safe?','zipsafe')
+              ('Project name', 'project', 'text'),
+              ('Version', 'version', 'text'),
+              ('Description (one liner)', 'shortdesc', 'text'),
+              ('Long description (multiline reStructuredText)', 'longdesc', 'text'),
+              ('Author', 'authorname', 'text'),
+              ('Author email', 'authoremail', 'text'),
+              ('URL to project page', 'projecturl', 'text'),
+              ('License', 'license', 'text'),
+              ('Zip safe?', 'zipsafe', 'checkbox')
         ]
 
     # build the list of field widgets
     fieldwidgets = []
-    for (label, inputname) in fieldset:
-        fieldwidgets.append(urwid.Edit(label + ': ', ''))
+    for (label, inputname, fieldtype) in fieldset:
+        if fieldtype == 'text':
+            field = urwid.Edit(label + ': ', '')
+        elif fieldtype == 'checkbox':
+            field = urwid.CheckBox(label)
+        fieldwidgets.append(field)
 
     # this is going to be what we actually do when someone clicks the button
     def ok_button_callback(button):
@@ -82,7 +86,10 @@ def main():
     except ExitPasterDemo as inst:
         for i in range(len(fieldset)):
             print fieldset[i][0] + ':',
-            print fieldwidgets[i].get_edit_text()
+            if fieldset[i][2] == 'text':
+                print fieldwidgets[i].get_edit_text()
+            elif fieldset[i][2] == 'checkbox':
+                print fieldwidgets[i].get_state()
         print "Exit value: " + inst.exit_token
 
 if '__main__'==__name__:
