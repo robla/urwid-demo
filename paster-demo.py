@@ -63,7 +63,7 @@ class FieldManager(object):
 
 
 def get_field(labeltext, inputname, fieldtype, fieldmgr):
-    """ Build a field in our form."""
+    """ Build a field in our form.  Called from get_body()"""
     label = urwid.Text(labeltext + ': ')
 
     if fieldtype == 'text':
@@ -90,7 +90,7 @@ def get_field(labeltext, inputname, fieldtype, fieldmgr):
 
 
 def get_buttons():
-    """ renders the ok and cancel buttons."""
+    """ renders the ok and cancel buttons.  Called from get_body() """
 
     # this is going to be what we actually do when someone clicks the button
     def ok_button_callback(button):
@@ -105,20 +105,16 @@ def get_buttons():
     return urwid.Columns([okbutton, cancelbutton])
 
 
-def main():
-    # call our homebrewed object for managing our fields
-    fieldmgr = FieldManager()
-
-    #  Our main loop is going to need a couple of things: 
-    #  1. topmost widget - a "box widget" at the top of the widget hierarchy
-    #  2. palette - style information for the UI
-    
-    #  1. topmost widget - a "box widget" at the top of the widget hierarchy
+def get_header():
+    """ the header of our form, called from main() """
     text_header = ("'paster create' Configuration"
         " - Use arrow keys to select a field to edit, select 'OK'"
         " when finished, or select 'Cancel' to exit")
-    header = urwid.Text(text_header)
+    return urwid.Text(text_header)
 
+
+def get_body(fieldmgr):
+    """ the body of our form, called from main() """
     fieldset = [
               ('Project name', 'project', 'text'),
               ('Version', 'version', 'text'),
@@ -142,8 +138,21 @@ def main():
     listwalker = urwid.SimpleListWalker(fieldwidgets)
 
     # ListBox is a scrollable frame around a list of elements
-    listbox = urwid.ListBox(listwalker)
-    frame = urwid.Frame(listbox, header=header)
+    return urwid.ListBox(listwalker)
+
+
+def main():
+    # call our homebrewed object for managing our fields
+    fieldmgr = FieldManager()
+
+    #  Our main loop is going to need a couple of things: 
+    #  1. topmost widget - a "box widget" at the top of the widget hierarchy
+    #  2. palette - style information for the UI
+    
+    #  1. topmost widget - a "box widget" at the top of the widget hierarchy
+    header = get_header()
+    body = get_body(fieldmgr)
+    frame = urwid.Frame(body, header=header)
 
     #  2. palette - style information for the UI
     #  ....we'll get to this
