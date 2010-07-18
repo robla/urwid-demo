@@ -34,11 +34,14 @@ class ExitPasterDemo():
 
 def get_field(labeltext, inputname, fieldtype):
     """ Build a field in our form."""
+    label = urwid.Text(labeltext + ': ')
+
     if fieldtype == 'text':
-        field = urwid.Edit(labeltext + ': ', '')
+        field = urwid.Edit('', '')
     elif fieldtype == 'checkbox':
-        field = urwid.CheckBox(labeltext)
-    return field
+        field = urwid.CheckBox('')
+    # put the label and field together.
+    return urwid.Columns([label, field])
 
 
 def get_buttons():
@@ -98,9 +101,9 @@ def main():
         for i in range(len(fieldset)):
             print fieldset[i][0] + ':',
             if fieldset[i][2] == 'text':
-                print fieldwidgets[i].get_edit_text()
+                print fieldwidgets[i].widget_list[1].get_edit_text()
             elif fieldset[i][2] == 'checkbox':
-                print fieldwidgets[i].get_state()
+                print fieldwidgets[i].widget_list[1].get_state()
         print "Exit value: " + inst.exit_token
 
 if '__main__'==__name__:
